@@ -1,4 +1,7 @@
 # The Malac Blockchain
+
+![alt text](./doc/main.png)
+
 A production-level decentralized and open-source blockchain platform built using `Node.js` for main tasks and `C` for performance-critical network tasks, also It's very easy and scalable. Inspired by the likes of Ethereum, Solana, and Bitcoin. Also, It uses a Proof-of-Work consensus mechanism to secure the validation process.
 
 ## **Components**
@@ -8,6 +11,10 @@ A production-level decentralized and open-source blockchain platform built using
 * **API Server**: To interaction with the blockchain from the internet.
 * **Consensus Algorithm**: For data legitimate and always synchronized.
 * **Block Explorer:** very simple UI for Blockchain data explorer intigrated with eth-data-library. 
+
+## **High-level overview of Architecture and Design**
+
+![high-level overview](./doc/image.png)
 
 ## **Goals**
 
