@@ -6,12 +6,24 @@
   "scripts": {
     "start": "nodemon /src/index"
   },
-  "keywords": ["Blockchain", "Nodejs", "C", "Web3", "Decentralized", "Coin", "Backend", "Frontend", "CSS", "EJS"],
+  "keywords": [
+    "Blockchain",
+    "Nodejs",
+    "C",
+    "Web3",
+    "Decentralized",
+    "Coin",
+    "Backend",
+    "Frontend",
+    "CSS",
+    "EJS"
+  ],
   "author": "Samuel",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.20.2",
     "express": "^4.19.2",
+    "node-gyp": "^10.1.0",
     "nodemon": "^3.1.3",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
