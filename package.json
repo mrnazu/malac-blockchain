@@ -4,7 +4,8 @@
   "description": "",
   "main": "./src/index.js",
   "scripts": {
-    "start": "nodemon /src/index"
+    "start": "nodemon /src/index",
+    "test": "mocha --require chai 'test/**/*.test.js'"
   },
   "keywords": [
     "Blockchain",
@@ -29,5 +30,9 @@
     "request-promise": "^4.2.6",
     "sha256": "^0.2.0",
     "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "chai": "^5.1.1",
+    "mocha": "^10.6.0"
   }
 }
