@@ -1,5 +1,3 @@
-// test/blockchain.test.js
-
 const assert = require("assert");
 const Blockchain = require("../src/blockchain/blockchain");
 
@@ -93,6 +91,30 @@ describe("Blockchain", () => {
 
       assert.equal(blockchain.UTXO.length, 0);
       console.log("New Block Data with Transactions:", newBlock);
+    });
+  });
+
+  describe("Chain", () => {
+    it("Blocks list with valid transactions we added here for test purpose", () => {
+      blockchain.createNewTransaction(
+        200,
+        "ALICExb94d27b9934d3e08a52",
+        "BOBxd7a8fbb307d7809469ca9ab"
+      );
+      blockchain.createNewTransaction(
+        75,
+        "CARLWw4c84b5f17d28a1b",
+        "DAVExf9a3c6f12b54e92c"
+      );
+
+      const newBlock = blockchain.NewBlock(
+        "0x98765432",
+        "b94d27b9934d3e08a52e52d7da7dabfac484e",
+        "f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d"
+      );
+
+      console.log("Blockchain Chain:");
+      console.log(blockchain.chain);
     });
   });
 });
