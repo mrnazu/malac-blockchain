@@ -2,6 +2,7 @@
 
 const Block = require("./block");
 const Transaction = require("./transaction");
+const sha256 = require('sha256');
 
 class Blockchain {
   constructor() {
@@ -42,6 +43,13 @@ class Blockchain {
     this.UTXO.push(newTransaction);
     return this.getLastBlock()["index"] + 1;
   }
+}
+
+// hashing the block
+Blockchain.prototype.hashBlock = function(prvHash, currentBlock, nonce){
+  const dataString = prvHash + nonce.toString() + JSON.stringify(currentBlock);
+  const hash = sha256(dataString);
+  return hash;
 }
 
 module.exports = Blockchain;

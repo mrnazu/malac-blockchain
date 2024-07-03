@@ -117,4 +117,43 @@ describe("Blockchain", () => {
       console.log(blockchain.chain);
     });
   });
+
+  describe("Hash Function", () => {
+    it("should produce consistent hashes for the same input", () => {
+      const prvHash = "b94d27b9934d3e08a52e52d7da7dabfac484e";
+      const currentBlock = {
+        index: 1,
+        timestamp: 1720019796100,
+        transactions: [],
+        nonce: "0x12345678",
+        hash: "d7a8fbb307d7809469ca9abcb0082e4f"
+      };
+      const nonce = "0x12345678";
+
+      const hash1 = blockchain.hashBlock(prvHash, currentBlock, nonce);
+      const hash2 = blockchain.hashBlock(prvHash, currentBlock, nonce);
+
+      assert.equal(hash1, hash2, "Hashes should be consistent");
+    });
+
+    it("should produce different hashes for different input", () => {
+      const prvHash1 = "b94d27b9934d3e08a52e52d7da7dabfac484e";
+      const prvHash2 = "32302940f7a81396e789816813f9";
+      const currentBlock = {
+        index: 1,
+        timestamp: 1720019796100,
+        transactions: [],
+        nonce: "0x12345678",
+        hash: "d7a8fbb307d7809469ca9abcb0082e4f"
+      };
+      const nonce = "0x12345674";
+
+      const hash1 = blockchain.hashBlock(prvHash1, currentBlock, nonce);
+      console.log(`Hash 1: ${hash1}`);
+      const hash2 = blockchain.hashBlock(prvHash2, currentBlock, nonce);
+      console.log(`Hash 2: ${hash2}`);
+
+      assert.notEqual(hash1, hash2, "Hashes should be different");
+    });
+  });
 });
