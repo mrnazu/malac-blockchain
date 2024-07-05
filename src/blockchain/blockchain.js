@@ -9,6 +9,8 @@ class Blockchain {
     this.chain = [];
     this.UTXO = [];
     this.createGenesisBlock();
+    this.difficulty = 3; // Initial difficulty level
+    this.adjustmentInterval = 10; // Interval (in blocks) to adjust difficulty
   }
 
   // Genesis block or the very first block in the blockchain
@@ -34,10 +36,16 @@ class Blockchain {
     );
     this.UTXO = []; // Clear the UTXO after including transactions in the block
     this.chain.push(newBlock);
+
+    // difficulty every adjustmentInterval blocks
+    if (this.chain.length % this.adjustmentInterval === 0) {
+      this.adjustDifficulty();
+    }
+
     return newBlock;
   }
 
-  // Create a new transaction and add it to the unconfirmed or unspent transactions (UTXO)
+  // Create a new tx and add it to the unconfirmed or unspent transactions (UTXO)
   createNewTransaction(amount, sender, recipient) {
     const newTransaction = new Transaction(amount, sender, recipient);
     this.UTXO.push(newTransaction);
@@ -52,6 +60,26 @@ class Blockchain {
   // Proof of Work
   proofOfWork(prvHash, currentBlock, difficulty) {
     return proofOfWork(prvHash, currentBlock, difficulty);
+  }
+
+  // Adjust difficulty based on network conditions
+  adjustDifficulty() {
+    const lastBlock = this.getLastBlock();
+    const prevAdjustmentBlock = this.chain[this.chain.length - this.adjustmentInterval];
+    const timeExpected = this.adjustmentInterval * 1000 * 60; // Expected time in milliseconds for this many blocks (adjustmentInterval blocks)
+
+    const timeTaken = lastBlock.timestamp - prevAdjustmentBlock.timestamp;
+
+    if (timeTaken < timeExpected / 2) {
+      this.difficulty++;
+    } else if (timeTaken > timeExpected * 2) {
+      this.difficulty--;
+    }
+
+    // difficulty never drops below 1
+    if (this.difficulty < 1) {
+      this.difficulty = 1;
+    }
   }
 }
 
