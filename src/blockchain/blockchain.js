@@ -2,7 +2,7 @@
 
 const Block = require("./block");
 const Transaction = require("./transaction");
-const sha256 = require('sha256');
+const { proofOfWork, hashBlock } = require("../consensus/pow");
 
 class Blockchain {
   constructor() {
@@ -11,7 +11,7 @@ class Blockchain {
     this.createGenesisBlock();
   }
 
-  // genesis block or the very first block in the blockchain
+  // Genesis block or the very first block in the blockchain
   createGenesisBlock() {
     const genesisBlock = new Block(0, Date.now(), [], "0x0", "0x0", "0x0");
     this.chain.push(genesisBlock);
@@ -37,19 +37,22 @@ class Blockchain {
     return newBlock;
   }
 
-  // Create a new transaction and add it to the unconfirmed or unspent, (i guess) transactions (UTXO)
+  // Create a new transaction and add it to the unconfirmed or unspent transactions (UTXO)
   createNewTransaction(amount, sender, recipient) {
     const newTransaction = new Transaction(amount, sender, recipient);
     this.UTXO.push(newTransaction);
     return this.getLastBlock()["index"] + 1;
   }
-}
 
-// hashing the block
-Blockchain.prototype.hashBlock = function(prvHash, currentBlock, nonce){
-  const dataString = prvHash + nonce.toString() + JSON.stringify(currentBlock);
-  const hash = sha256(dataString);
-  return hash;
+  // Hashing the block
+  hashBlock(prvHash, currentBlock, nonce) {
+    return hashBlock(prvHash, currentBlock, nonce);
+  }
+
+  // Proof of Work
+  proofOfWork(prvHash, currentBlock, difficulty) {
+    return proofOfWork(prvHash, currentBlock, difficulty);
+  }
 }
 
 module.exports = Blockchain;
