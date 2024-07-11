@@ -3,6 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const Blockchain = require('../src/blockchain/blockchain');
+const { validateTransaction } = require('./middleware/validationMiddleware');
 
 const blockchain = new Blockchain();
 
@@ -18,15 +19,15 @@ router.get('/block/:index', (req, res) => {
   if (block) {
     res.json(block);
   } else {
-    res.status(404).send('Block not found');
+    res.status(404).json({ error: 'Block not found' });
   }
 });
 
 // Create a new transaction
-router.post('/transaction', (req, res) => {
+router.post('/transaction', validateTransaction, (req, res) => {
   const { amount, sender, recipient } = req.body;
   const blockIndex = blockchain.createNewTransaction(amount, sender, recipient);
-  res.json({ message: `Transaction will be added in block ${blockIndex}` });
+  res.status(201).json({ message: `Transaction will be added in block ${blockIndex}` });
 });
 
 // Mine a new block
@@ -39,7 +40,7 @@ router.get('/mine', (req, res) => {
   const { nonce, hash } = blockchain.proofOfWork(previousHash, currentBlockData, difficulty);
 
   const newBlock = blockchain.NewBlock(nonce, previousHash, hash);
-  res.json({ message: 'New block mined successfully', block: newBlock });
+  res.status(201).json({ message: 'New block mined successfully', block: newBlock });
 });
 
 // Get the balance of a specific address
