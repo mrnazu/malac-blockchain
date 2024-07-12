@@ -160,3 +160,112 @@ curl http://localhost:3000/api/difficulty
   "difficulty": 4
 }
 ```
+
+## Node Network API Documentation
+
+### 1. Add a Peer
+
+**Endpoint**: `POST /add-peer`  
+**Description**: Adds a new peer to the node's peer list.
+
+**Request**:
+```sh
+curl -X POST http://localhost:3001/add-peer -H "Content-Type: application/json" -d '{"peer": "http://localhost:3002"}'
+```
+
+**Response**:
+```json
+{
+  "message": "Peer http://localhost:3002 added successfully"
+}
+```
+
+**Notes**:
+- This endpoint adds the specified peer to the node's list of peers if it is not already present.
+
+### 2. Sync Blockchain Data
+
+**Endpoint**: `POST /sync`  
+**Description**: Syncs the blockchain data from a peer.
+
+**Request**:
+```sh
+curl -X POST http://localhost:3001/sync -H "Content-Type: application/json" -d '{"chain": [{"index": 1, "previousHash": "0", "timestamp": 1633000000000, "data": "Genesis block", "hash": "abcd1234"}]}'
+```
+
+**Response**:
+```json
+{
+  "message": "Data received successfully"
+}
+```
+
+**Notes**:
+- This endpoint allows a node to receive and process blockchain data from another peer. The `chain` parameter should be an array representing the blockchain.
+
+### 3. Get Node Status
+
+**Endpoint**: `GET /status`  
+**Description**: Retrieves the status of the node, including the port and list of peers.
+
+**Request**:
+```sh
+curl -X GET http://localhost:3001/status
+```
+
+**Response**:
+```json
+{
+  "port": "3001",
+  "peers": [
+    "http://localhost:3001",
+    "http://localhost:3003",
+    "http://localhost:3002"
+  ]
+}
+```
+
+**Notes**:
+- This endpoint provides the current status of the node, including the port number and the list of connected peers.
+
+### 4. Get List of Peers
+
+**Endpoint**: `GET /peers`  
+**Description**: Retrieves the list of all peers connected to the node.
+
+**Request**:
+```sh
+curl -X GET http://localhost:3001/peers
+```
+
+**Response**:
+```json
+[
+  "http://localhost:3001",
+  "http://localhost:3003",
+  "http://localhost:3002"
+]
+```
+
+**Notes**:
+- This endpoint returns an array of peer URLs that the node is connected to.
+
+### 5. Remove a Peer
+
+**Endpoint**: `DELETE /remove-peer`  
+**Description**: Removes a specified peer from the node's peer list.
+
+**Request**:
+```sh
+curl -X DELETE http://localhost:3001/remove-peer -H "Content-Type: application/json" -d '{"peer": "http://localhost:3002"}'
+```
+
+**Response**:
+```json
+{
+  "message": "Peer http://localhost:3002 removed successfully"
+}
+```
+
+**Notes**:
+- This endpoint removes the specified peer from the node’s list if it exists.
