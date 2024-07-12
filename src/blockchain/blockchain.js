@@ -53,7 +53,36 @@ class Blockchain {
   // Proof of Work
   proofOfWork(prvHash, currentBlock, difficulty) {
     return proofOfWork(prvHash, currentBlock, difficulty);
-  }             
+  }
+
+  isChainValid() {
+    for (let i = 1; i < this.chain.length; i++) {
+      const currentBlock = this.chain[i];
+      const previousBlock = this.chain[i - 1];
+
+      // Check hash consistency
+      if (currentBlock.prvHash !== previousBlock.hash) {
+        return false;
+      }
+
+      // Check block hash
+      const blockData = {
+        index: currentBlock.index,
+        transactions: currentBlock.transactions,
+        nonce: currentBlock.nonce,
+      };
+      const calculatedHash = this.hashBlock(
+        previousBlock.hash,
+        blockData,
+        currentBlock.nonce
+      );
+      if (currentBlock.hash !== calculatedHash) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
 module.exports = Blockchain;
