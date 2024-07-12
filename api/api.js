@@ -26,6 +26,10 @@ router.get('/block/:index', (req, res) => {
 // Create a new transaction
 router.post('/transaction', validateTransaction, (req, res) => {
   const { amount, sender, recipient } = req.body;
+  if (amount <= 0 || !sender || !recipient) {
+    return res.status(400).json({ error: 'Invalid transaction data' });
+  }
+
   const blockIndex = blockchain.createNewTransaction(amount, sender, recipient);
   res.status(201).json({ message: `Transaction will be added in block ${blockIndex}` });
 });
@@ -35,7 +39,7 @@ router.get('/mine', (req, res) => {
   const lastBlock = blockchain.getLastBlock();
   const previousHash = lastBlock.hash;
   const currentBlockData = { index: lastBlock.index + 1, transactions: blockchain.UTXO };
-  const difficulty = 4; // You can adjust the difficulty as needed
+  const difficulty = 4;
 
   const { nonce, hash } = blockchain.proofOfWork(previousHash, currentBlockData, difficulty);
 
