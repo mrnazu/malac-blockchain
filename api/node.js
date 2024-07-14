@@ -7,6 +7,8 @@ const blockchainRoutes = require("./api");
 const { addPeer, getPeers, removePeer } = require("./peerManager");
 const Blockchain = require("../src/blockchain/blockchain");
 const fetch = require("node-fetch");
+const { generateKeyPair, loadKeys, signTransaction } = require('../src/blockchain/keyManager');
+const Transaction = require('../src/blockchain/transaction');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -17,12 +19,11 @@ const blockchain = new Blockchain();
 app.use(bodyParser.json());
 app.use("/api", blockchainRoutes);
 
-// Register node and add itself to peer list
 const registerNode = async () => {
   const selfUrl = `http://localhost:${port}`;
   addPeer(selfUrl);
 
-  const peers = ["http://localhost:3002", "http://localhost:3003"];
+  const peers = ["http://localhost:3001", "http://localhost:3002", "http://localhost:3003", "http://localhost:3004", "http://localhost:3005"];
 
   for (const peer of peers) {
     try {
@@ -33,12 +34,11 @@ const registerNode = async () => {
       });
       console.log(`Successfully registered with ${peer}`);
     } catch (error) {
-      console.error(`Failed to register with peer ${peer}`, error);
+      console.error(`Failed to register with peer ${peer}:`, error);
     }
   }
 };
 
-// Add a new peer node
 app.post("/add-peer", (req, res) => {
   const { peer } = req.body;
   if (!peers.has(peer)) {
@@ -48,7 +48,6 @@ app.post("/add-peer", (req, res) => {
   res.json({ message: `Peer ${peer} added successfully` });
 });
 
-// Broadcast a message to all peers
 const broadcast = (path, data) => {
   peers.forEach(async (peer) => {
     try {
@@ -63,21 +62,20 @@ const broadcast = (path, data) => {
   });
 };
 
-// Create a new transaction and broadcast it to peers
 app.post("/api/transaction", (req, res) => {
   const { amount, sender, recipient } = req.body;
   if (amount <= 0 || !sender || !recipient) {
     return res.status(400).json({ error: "Invalid transaction data" });
   }
 
-  const blockIndex = blockchain.createNewTransaction(amount, sender, recipient);
-  broadcast("/api/transaction", req.body); // Broadcast the transaction to peers
-  res
-    .status(201)
-    .json({ message: `Transaction will be added in block ${blockIndex}` });
+  const { privateKey } = loadKeys();
+  const transaction = new Transaction(amount, sender, recipient, privateKey);
+  
+  const blockIndex = blockchain.createNewTransaction(transaction.amount, transaction.sender, transaction.recipient, transaction.signature, transaction.id);
+  broadcast("/api/transaction", transaction);
+  res.status(201).json({ message: `Transaction will be added in block ${blockIndex}`, transaction });
 });
 
-// Mine a new block and broadcast it to peers
 app.get("/api/mine", (req, res) => {
   const lastBlock = blockchain.getLastBlock();
   const previousHash = lastBlock.hash;
@@ -94,13 +92,10 @@ app.get("/api/mine", (req, res) => {
   );
   const newBlock = blockchain.NewBlock(nonce, previousHash, hash);
 
-  broadcast("/api/blockchain", { chain: blockchain.chain }); // Broadcast the new block to peers
-  res
-    .status(201)
-    .json({ message: "New block mined successfully", block: newBlock });
+  broadcast("/api/blockchain", { chain: blockchain.chain });
+  res.status(201).json({ message: "New block mined successfully", block: newBlock });
 });
 
-// Sync blockchain data from peers
 app.use(bodyParser.json());
 app.post("/sync", (req, res) => {
   try {
@@ -108,7 +103,6 @@ app.post("/sync", (req, res) => {
     if (!Array.isArray(chain)) {
       throw new Error("Invalid data format: chain should be an array");
     }
-    // Process the blockchain data
     console.log("Received blockchain data:", chain);
     res.status(200).json({ message: "Data received successfully" });
   } catch (error) {
@@ -117,7 +111,6 @@ app.post("/sync", (req, res) => {
   }
 });
 
-// Get the status of the node
 app.get("/status", (req, res) => {
   const status = {
     port: port,
@@ -126,12 +119,10 @@ app.get("/status", (req, res) => {
   res.json(status);
 });
 
-// Get the list of peers
 app.get("/peers", (req, res) => {
   res.json(Array.from(peers));
 });
 
-// Remove a peer from the list
 app.delete("/remove-peer", (req, res) => {
   const { peer } = req.body;
   if (peers.has(peer)) {

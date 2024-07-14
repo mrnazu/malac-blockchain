@@ -7,12 +7,10 @@ const { validateTransaction } = require('./middleware/validationMiddleware');
 
 const blockchain = new Blockchain();
 
-// Get the entire blockchain
 router.get('/blockchain', (req, res) => {
   res.json(blockchain.chain);
 });
 
-// Get a specific block by index
 router.get('/block/:index', (req, res) => {
   const index = parseInt(req.params.index, 10);
   const block = blockchain.chain.find(b => b.index === index);
@@ -23,18 +21,18 @@ router.get('/block/:index', (req, res) => {
   }
 });
 
-// Create a new transaction
 router.post('/transaction', validateTransaction, (req, res) => {
   const { amount, sender, recipient } = req.body;
   if (amount <= 0 || !sender || !recipient) {
     return res.status(400).json({ error: 'Invalid transaction data' });
   }
 
-  const blockIndex = blockchain.createNewTransaction(amount, sender, recipient);
-  res.status(201).json({ message: `Transaction will be added in block ${blockIndex}` });
+  const { privateKey } = loadKeys();
+  const transaction = new Transaction(amount, sender, recipient, privateKey);
+  const blockIndex = blockchain.createNewTransaction(transaction.amount, transaction.sender, transaction.recipient, transaction.signature, transaction.id);
+  res.status(201).json({ message: `Transaction will be added in block ${blockIndex}`, transaction });
 });
 
-// Mine a new block
 router.get('/mine', (req, res) => {
   const lastBlock = blockchain.getLastBlock();
   const previousHash = lastBlock.hash;
@@ -47,7 +45,6 @@ router.get('/mine', (req, res) => {
   res.status(201).json({ message: 'New block mined successfully', block: newBlock });
 });
 
-// Get the balance of a specific address
 router.get('/balance/:address', (req, res) => {
   const address = req.params.address;
   let balance = 0;
@@ -65,14 +62,12 @@ router.get('/balance/:address', (req, res) => {
   res.json({ address, balance });
 });
 
-// Get the list of pending transactions
 router.get('/pending-transactions', (req, res) => {
   res.json(blockchain.UTXO);
 });
 
-// Get the current mining difficulty
 router.get('/difficulty', (req, res) => {
-  res.json({ difficulty: 4 }); // Static difficulty for now
+  res.json({ difficulty: 4 });
 });
 
 module.exports = router;

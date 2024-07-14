@@ -11,23 +11,20 @@ class Blockchain {
     this.createGenesisBlock();
   }
 
-  // Genesis block or the very first block in the blockchain
   createGenesisBlock() {
     const genesisBlock = new Block(0, Date.now(), [], "0x0", "0x0", "0x0");
     this.chain.push(genesisBlock);
   }
 
-  // Get the last block in the blockchain
   getLastBlock() {
     return this.chain[this.chain.length - 1];
   }
 
-  // Create a new block in the blockchain
   NewBlock(nonce, prvHash, hash) {
     const newBlock = new Block(
       this.chain.length,
       Date.now(),
-      this.UTXO.slice(), // Include pending transactions
+      this.UTXO.slice(),
       nonce,
       hash,
       prvHash
@@ -38,19 +35,23 @@ class Blockchain {
     return newBlock;
   }
 
-  // Create a new tx and add it to the unconfirmed or unspent transactions (UTXO)
-  createNewTransaction(amount, sender, recipient) {
+  createNewTransaction(amount, sender, recipient, signature, transactionId) {
     const newTransaction = new Transaction(amount, sender, recipient);
+    newTransaction.id = transactionId;
+    newTransaction.signature = signature;
     this.UTXO.push(newTransaction);
-    return this.getLastBlock()["index"] + 1;
+    return this.getLastBlock().index + 1;
   }
 
-  // Hashing the block
+  isValidTransaction(transaction) {
+    const { publicKey } = loadKeys();
+    return transaction.verifyTransactionSignature(publicKey);
+  }
+
   hashBlock(prvHash, currentBlock, nonce) {
     return hashBlock(prvHash, currentBlock, nonce);
   }
 
-  // Proof of Work
   proofOfWork(prvHash, currentBlock, difficulty) {
     return proofOfWork(prvHash, currentBlock, difficulty);
   }
@@ -60,12 +61,10 @@ class Blockchain {
       const currentBlock = this.chain[i];
       const previousBlock = this.chain[i - 1];
 
-      // Check hash consistency
       if (currentBlock.prvHash !== previousBlock.hash) {
         return false;
       }
 
-      // Check block hash
       const blockData = {
         index: currentBlock.index,
         transactions: currentBlock.transactions,
@@ -78,6 +77,13 @@ class Blockchain {
       );
       if (currentBlock.hash !== calculatedHash) {
         return false;
+      }
+
+      // Validate all transactions in the block
+      for (const transaction of currentBlock.transactions) {
+        if (!this.isValidTransaction(transaction)) {
+          return false;
+        }
       }
     }
 
