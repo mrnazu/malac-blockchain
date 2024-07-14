@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block Details</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/api-docs">API Docs</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="https://github.com/your-repo" target="_blank">GitHub</a></li>
+                <li>Developer: Your Name</li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>Block Details</h1>
+        <div>
+            <p><strong>Block Number:</strong> <%= block.index %></p>
+            <p><strong>Hash:</strong> <%= block.hash %></p>
+            <p><strong>Previous Hash:</strong> <%= block.prvHash %></p>
+            <p><strong>Nonce:</strong> <%= block.nonce %></p>
+            <p><strong>Timestamp:</strong> <%= new Date(block.timestamp).toLocaleString() %></p>
+            <p><strong>Difficulty:</strong> <%= block.difficulty %></p>
+            <p><strong>Transactions:</strong></p>
+            <ul>
+                <% block.transactions.forEach(tx => { %>
+                    <li>
+                        <strong>Tx ID:</strong> <%= tx.id %> |
+                        <strong>Amount:</strong> <%= tx.amount %> |
+                        <strong>Sender:</strong> <%= tx.sender %> |
+                        <strong>Recipient:</strong> <%= tx.recipient %>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+    </main>
+</body>
+</html>
