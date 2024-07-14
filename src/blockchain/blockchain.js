@@ -3,6 +3,7 @@
 const Block = require("./block");
 const Transaction = require("./transaction");
 const { proofOfWork, hashBlock } = require("../consensus/pow");
+const { loadKeys } = require('./keyManager');
 
 class Blockchain {
   constructor() {
@@ -29,7 +30,7 @@ class Blockchain {
       hash,
       prvHash
     );
-    this.UTXO = []; // Clear the UTXO after including transactions in the block
+    this.UTXO = [];
     this.chain.push(newBlock);
 
     return newBlock;
@@ -61,10 +62,12 @@ class Blockchain {
       const currentBlock = this.chain[i];
       const previousBlock = this.chain[i - 1];
 
+      // Check hash consistency
       if (currentBlock.prvHash !== previousBlock.hash) {
         return false;
       }
 
+      // Check block hash
       const blockData = {
         index: currentBlock.index,
         transactions: currentBlock.transactions,
