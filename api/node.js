@@ -7,7 +7,7 @@ const blockchainRoutes = require("./api");
 const { addPeer, getPeers, removePeer } = require("./peerManager");
 const Blockchain = require("../src/blockchain/blockchain");
 const fetch = require("node-fetch");
-const { generateKeyPair, loadKeys, signTransaction } = require('../src/blockchain/keyManager');
+const { loadKeys } = require('../src/blockchain/keyManager');
 const Transaction = require('../src/blockchain/transaction');
 
 const app = express();
