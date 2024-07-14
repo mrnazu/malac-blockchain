@@ -37,16 +37,20 @@ class Blockchain {
   }
 
   createNewTransaction(amount, sender, recipient, signature, transactionId) {
-    const newTransaction = new Transaction(amount, sender, recipient);
+    const newTransaction = new Transaction(amount, sender, recipient, signature); // Pass signature here
     newTransaction.id = transactionId;
-    newTransaction.signature = signature;
     this.UTXO.push(newTransaction);
     return this.getLastBlock().index + 1;
   }
 
   isValidTransaction(transaction) {
-    const { publicKey } = loadKeys();
-    return transaction.verifyTransactionSignature(publicKey);
+    try {
+      const { publicKey } = loadKeys();
+      return transaction.verifyTransactionSignature(publicKey);
+    } catch (error) {
+      console.error('Error validating transaction:', error);
+      return false;
+    }
   }
 
   hashBlock(prvHash, currentBlock, nonce) {

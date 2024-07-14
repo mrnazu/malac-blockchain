@@ -19,6 +19,30 @@ const blockchain = new Blockchain();
 app.use(bodyParser.json());
 app.use("/api", blockchainRoutes);
 
+// Function to register a node with a peer with retry logic
+const registerNodeWithRetry = async (peerUrl, selfUrl, retries = 5) => {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await fetch(`${peerUrl}/add-peer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ peer: selfUrl }),
+      });
+      console.log(`Successfully registered with ${peerUrl}`);
+      return; // Exit the function if successful
+    } catch (error) {
+      console.error(`Failed to register with ${peerUrl}: ${error.message}`);
+      if (attempt < retries) {
+        console.log(`Retrying registration with ${peerUrl}... Attempt ${attempt}/${retries}`);
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait before retrying
+      } else {
+        console.error(`All registration attempts with ${peerUrl} failed.`);
+      }
+    }
+  }
+};
+
+// Register this node with all peers
 const registerNode = async () => {
   const selfUrl = `http://localhost:${port}`;
   addPeer(selfUrl);
@@ -26,18 +50,18 @@ const registerNode = async () => {
   const peers = ["http://localhost:3001", "http://localhost:3002", "http://localhost:3003", "http://localhost:3004", "http://localhost:3005"];
 
   for (const peer of peers) {
-    try {
-      await fetch(`${peer}/add-peer`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ peer: selfUrl }),
-      });
-      console.log(`Successfully registered with ${peer}`);
-    } catch (error) {
-      console.error(`Failed to register with peer ${peer}:`, error);
-    }
+    await registerNodeWithRetry(peer, selfUrl);
   }
 };
+
+app.post("/add-peer", (req, res) => {
+  const { peer } = req.body;
+  if (!peers.has(peer)) {
+    peers.add(peer);
+    addPeer(peer);
+  }
+  res.json({ message: `Peer ${peer} added successfully` });
+});
 
 app.post("/add-peer", (req, res) => {
   const { peer } = req.body;
@@ -68,12 +92,18 @@ app.post("/api/transaction", (req, res) => {
     return res.status(400).json({ error: "Invalid transaction data" });
   }
 
-  const { privateKey } = loadKeys();
-  const transaction = new Transaction(amount, sender, recipient, privateKey);
-  
-  const blockIndex = blockchain.createNewTransaction(transaction.amount, transaction.sender, transaction.recipient, transaction.signature, transaction.id);
-  broadcast("/api/transaction", transaction);
-  res.status(201).json({ message: `Transaction will be added in block ${blockIndex}`, transaction });
+  try {
+    const { privateKey } = loadKeys();
+    console.log('Loaded private key:', privateKey); // Debug log
+    const transaction = new Transaction(amount, sender, recipient, privateKey);
+    
+    const blockIndex = blockchain.createNewTransaction(transaction.amount, transaction.sender, transaction.recipient, transaction.signature, transaction.id);
+    broadcast("/api/transaction", transaction);
+    res.status(201).json({ message: `Transaction will be added in block ${blockIndex}`, transaction });
+  } catch (error) {
+    console.error('Error loading keys:', error); // Error log
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 app.get("/api/mine", (req, res) => {

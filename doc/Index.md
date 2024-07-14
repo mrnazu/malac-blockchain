@@ -70,6 +70,8 @@ curl http://localhost:3000/api/block/1
 Block not found
 ```
 
+Remember: Block 0 still works since we've added the genesis block to our code.
+
 #### Response (Block found)
 ```json
 {

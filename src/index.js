@@ -9,6 +9,24 @@ const blockchainRoutes = require('../api/api');
 const app = express();
 const port = 3000;
 
+// Function to fetch data with retry logic
+const fetchDataWithRetry = async (url, retries = 5) => {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await axios.get(url);
+      return response.data;
+    } catch (error) {
+      console.error(`Failed to fetch data from ${url}: ${error.message}`);
+      if (attempt < retries) {
+        console.log(`Retrying... Attempt ${attempt}/${retries}`);
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait before retrying
+      } else {
+        throw new Error(`All attempts to fetch data from ${url} failed.`);
+      }
+    }
+  }
+}
+
 app.use(bodyParser.json());
 app.use('/api', blockchainRoutes);
 
@@ -42,9 +60,10 @@ app.server.on('upgrade', (request, socket, head) => {
     });
 });
 
+// Route to get latest blocks
 app.get('/', async (req, res) => {
     try {
-        const { data: latestBlocks } = await axios.get(`http://localhost:${port}/api/blockchain`);
+        const latestBlocks = await fetchDataWithRetry(`http://localhost:${port}/api/blockchain`);
         res.render('index', { latestBlocks });
     } catch (error) {
         console.error('Error fetching latest blocks:', error);
@@ -52,9 +71,10 @@ app.get('/', async (req, res) => {
     }
 });
 
+// Route to get a specific block
 app.get('/block/:index', async (req, res) => {
     try {
-        const { data: block } = await axios.get(`http://localhost:${port}/api/block/${req.params.index}`);
+        const { data: block } = await fetchDataWithRetry(`http://localhost:${port}/api/block/${req.params.index}`);
         res.render('block', { block });
     } catch (error) {
         console.error('Error fetching block:', error);
@@ -104,3 +124,5 @@ app.get('/api/mine', (req, res) => {
 
     res.status(201).json({ message: 'New block mined successfully', block: newBlock });
 });
+
+module.exports = app;

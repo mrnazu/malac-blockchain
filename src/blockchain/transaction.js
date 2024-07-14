@@ -2,7 +2,6 @@
 
 const crypto = require('crypto');
 
-// Constructor for transaction properties
 class Transaction {
   constructor(amount, sender, recipient, privateKey) {
     this.id = crypto.randomUUID(); // Unique transaction ID
@@ -13,18 +12,26 @@ class Transaction {
     this.signature = this.signTransaction(privateKey); // Digital signature
   }
 
-  // Sign the transaction using the sender's private key
   signTransaction(privateKey) {
-    const sign = crypto.createSign('SHA256');
-    sign.update(`${this.amount}${this.sender}${this.recipient}${this.timestamp}`);
-    return sign.sign({ key: privateKey, padding: crypto.constants.RSA_PKCS1_PSS_PADDING }).toString('hex');
+    try {
+      const sign = crypto.createSign('SHA256');
+      sign.update(`${this.amount}${this.sender}${this.recipient}${this.timestamp}`);
+      return sign.sign({ key: privateKey, padding: crypto.constants.RSA_PKCS1_PADDING }).toString('hex');
+    } catch (error) {
+      console.error('Error signing transaction:', error);
+      throw error;
+    }
   }
 
-  // Verify the transaction signature using the sender's public key
   verifyTransactionSignature(publicKey) {
-    const verify = crypto.createVerify('SHA256');
-    verify.update(`${this.amount}${this.sender}${this.recipient}${this.timestamp}`);
-    return verify.verify(publicKey, this.signature, 'hex');
+    try {
+      const verify = crypto.createVerify('SHA256');
+      verify.update(`${this.amount}${this.sender}${this.recipient}${this.timestamp}`);
+      return verify.verify(publicKey, this.signature, 'hex');
+    } catch (error) {
+      console.error('Error verifying transaction signature:', error);
+      throw error;
+    }
   }
 }
 

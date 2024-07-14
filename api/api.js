@@ -3,7 +3,9 @@
 const express = require('express');
 const router = express.Router();
 const Blockchain = require('../src/blockchain/blockchain');
+const Transaction = require('../src/blockchain/transaction');
 const { validateTransaction } = require('./middleware/validationMiddleware');
+const { loadKeys } = require('../src/blockchain/keyManager');
 
 const blockchain = new Blockchain();
 
@@ -27,10 +29,18 @@ router.post('/transaction', validateTransaction, (req, res) => {
     return res.status(400).json({ error: 'Invalid transaction data' });
   }
 
-  const { privateKey } = loadKeys();
-  const transaction = new Transaction(amount, sender, recipient, privateKey);
-  const blockIndex = blockchain.createNewTransaction(transaction.amount, transaction.sender, transaction.recipient, transaction.signature, transaction.id);
-  res.status(201).json({ message: `Transaction will be added in block ${blockIndex}`, transaction });
+  try {
+    const { privateKey } = loadKeys();
+    if (!privateKey) {
+      throw new Error('Failed to load private key');
+    }
+    const transaction = new Transaction(amount, sender, recipient, privateKey); // Pass privateKey here
+    const blockIndex = blockchain.createNewTransaction(transaction.amount, transaction.sender, transaction.recipient, transaction.signature, transaction.id);
+    res.status(201).json({ message: `Transaction will be added in block ${blockIndex}`, transaction });
+  } catch (error) {
+    console.error('Error processing transaction:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 router.get('/mine', (req, res) => {
