@@ -8,6 +8,8 @@
     "start:node1": "cross-env PORT=3001 nodemon api/node.js",
     "start:node2": "cross-env PORT=3002 nodemon api/node.js",
     "start:node3": "cross-env PORT=3003 nodemon api/node.js",
+    "start:node4": "cross-env PORT=3003 nodemon api/node.js",
+    "start:node5": "cross-env PORT=3003 nodemon api/node.js",
 
     "test": "mocha --require chai 'test/**/*.test.js'",
     

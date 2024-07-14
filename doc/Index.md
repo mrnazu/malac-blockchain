@@ -1,12 +1,36 @@
 # MALAC Blockchain API Documentation
+
 This documentation includes endpoint descriptions, sample `curl` commands, and their outputs. 
+
+## Table of Contents
+
+1. [Base URL](#base-url)
+2. [Blockchain API Endpoints](#blockchain-api-endpoints)
+    - [Get the Entire Blockchain](#1-get-the-entire-blockchain)
+    - [Get a Specific Block by Index](#2-get-a-specific-block-by-index)
+    - [Create a New Transaction](#3-create-a-new-transaction)
+    - [Mine a New Block](#4-mine-a-new-block)
+    - [Get the Balance of a Specific Address](#5-get-the-balance-of-a-specific-address)
+    - [Get the List of Pending Transactions](#6-get-the-list-of-pending-transactions)
+    - [Get the Current Mining Difficulty](#7-get-the-current-mining-difficulty)
+3. [Node Network API Endpoints](#node-network-api-endpoints)
+    - [Add a Peer](#1-add-a-peer)
+    - [Sync Blockchain Data](#2-sync-blockchain-data)
+    - [Get Node Status](#3-get-node-status)
+    - [Get List of Peers](#4-get-list-of-peers)
+    - [Remove a Peer](#5-remove-a-peer)
+
+---
 
 ## Base URL
 `http://localhost:3000/api`
 
-## Endpoints
+---
+
+## Blockchain API Endpoints
 
 ### 1. Get the Entire Blockchain
+
 **Endpoint:** `/blockchain`  
 **Method:** `GET`  
 **Description:** Retrieves the entire blockchain.
@@ -31,6 +55,7 @@ curl http://localhost:3000/api/blockchain
 ```
 
 ### 2. Get a Specific Block by Index
+
 **Endpoint:** `/block/{index}`  
 **Method:** `GET`  
 **Description:** Retrieves a specific block by its index.
@@ -64,6 +89,7 @@ Block not found
 ```
 
 ### 3. Create a New Transaction
+
 **Endpoint:** `/transaction`  
 **Method:** `POST`  
 **Description:** Creates a new transaction and adds it to the list of unconfirmed transactions.
@@ -81,6 +107,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"amount":100, "sender":"Sa
 ```
 
 ### 4. Mine a New Block
+
 **Endpoint:** `/mine`  
 **Method:** `GET`  
 **Description:** Mines a new block by finding a valid nonce and hash that meet the difficulty criteria, then adds the block to the blockchain.
@@ -112,6 +139,7 @@ curl http://localhost:3000/api/mine
 ```
 
 ### 5. Get the Balance of a Specific Address
+
 **Endpoint:** `/balance/{address}`  
 **Method:** `GET`  
 **Description:** Retrieves the balance of a specific address.
@@ -130,6 +158,7 @@ curl http://localhost:3000/api/balance/Sami
 ```
 
 ### 6. Get the List of Pending Transactions
+
 **Endpoint:** `/pending-transactions`  
 **Method:** `GET`  
 **Description:** Retrieves the list of pending transactions.
@@ -145,6 +174,7 @@ curl http://localhost:3000/api/pending-transactions
 ```
 
 ### 7. Get the Current Mining Difficulty
+
 **Endpoint:** `/difficulty`  
 **Method:** `GET`  
 **Description:** Retrieves the current mining difficulty.
@@ -161,7 +191,9 @@ curl http://localhost:3000/api/difficulty
 }
 ```
 
-## Node Network API Documentation
+---
+
+## Node Network API Endpoints
 
 ### 1. Add a Peer
 
