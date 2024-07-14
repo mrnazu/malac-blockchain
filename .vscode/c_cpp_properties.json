@@ -4,12 +4,13 @@
       "name": "windows-gcc-x86",
       "includePath": [
         "${workspaceFolder}/**",
-        "C:/Users/Hp/AppData/Local/node-gyp/Cache/20.10.0/include/node"
+        "C:/Users/Hp/AppData/Local/node-gyp/Cache/20.10.0/include/node",
+        "../node_modules/node-addon-api/"
       ],
       "compilerPath": "C:/MinGW/bin/gcc.exe",
-      "cStandard": "${default}",
-      "cppStandard": "${default}",
-      "intelliSenseMode": "windows-gcc-x86",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "gcc-x64",
       "compilerArgs": []
     }
   ],
