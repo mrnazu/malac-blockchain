@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>API Documentation</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/markdown.css" />
 </head>
 <body>
     <header>
@@ -18,19 +19,14 @@
             </ul>
         </nav>
     </header>
-    <main>
+    <main class="container">
         <h1>API Documentation</h1>
         <div id="api-docs-content">
-            <!-- The API docs will be loaded here -->
-        </div>
+            <%- content %>
+        </div>        
     </main>
-    <script>
-        fetch('/docs/index.md')
-            .then(response => response.text())
-            .then(text => {
-                document.getElementById('api-docs-content').innerText = text;
-            })
-            .catch(error => console.error('Error loading API docs:', error));
-    </script>
+    <footer class="footer">
+        <p>&copy; 2024 MALAC Blockchain Project</p>
+    </footer>
 </body>
 </html>

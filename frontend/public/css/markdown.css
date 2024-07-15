@@ -1,0 +1,129 @@
+/* markdown.css */
+
+/* General styling for markdown content */
+#api-docs-content {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    overflow-x: auto; /* Handle overflow of wide content */
+}
+
+#api-docs-content a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+#api-docs-content a:hover {
+    text-decoration: underline;
+}
+
+/* Headings */
+#api-docs-content h1,
+#api-docs-content h2,
+#api-docs-content h3,
+#api-docs-content h4,
+#api-docs-content h5,
+#api-docs-content h6 {
+    color: #333;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+#api-docs-content h1 {
+    font-size: 2em;
+}
+
+#api-docs-content h2 {
+    font-size: 1.75em;
+}
+
+#api-docs-content h3 {
+    font-size: 1.5em;
+}
+
+#api-docs-content h4 {
+    font-size: 1.25em;
+}
+
+#api-docs-content h5 {
+    font-size: 1em;
+}
+
+#api-docs-content h6 {
+    font-size: 0.875em;
+}
+
+/* Blockquotes */
+#api-docs-content blockquote {
+    border-left: 4px solid #ddd;
+    padding-left: 10px;
+    margin: 10px 0;
+    color: #666;
+    font-style: italic;
+    background: #f9f9f9; /* Light background for blockquotes */
+    border-radius: 4px;
+    padding: 10px;
+}
+
+/* Inline code */
+#api-docs-content code {
+    background: #f4f4f4;
+    border-radius: 4px;
+    padding: 2px 5px;
+    font-family: monospace;
+}
+
+/* Code blocks */
+#api-docs-content pre code {
+    display: block;
+    background: #f4f4f4;
+    padding: 10px;
+    overflow-x: auto;
+    border-radius: 4px;
+}
+
+/* Lists */
+#api-docs-content ul,
+#api-docs-content ol {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+#api-docs-content ul {
+    list-style-type: disc;
+}
+
+#api-docs-content ol {
+    list-style-type: decimal;
+}
+
+#api-docs-content li {
+    margin: 5px 0;
+}
+
+/* Tables */
+#api-docs-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+#api-docs-content table,
+#api-docs-content th,
+#api-docs-content td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+#api-docs-content th {
+    background: #333;
+    color: #fff;
+}
+
+#api-docs-content tr:nth-child(even) {
+    background: #f9f9f9;
+}

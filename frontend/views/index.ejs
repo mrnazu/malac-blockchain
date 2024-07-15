@@ -13,17 +13,11 @@
                 const data = JSON.parse(event.data);
                 console.log('Received update:', data);
 
-                // Handle updates based on type
                 if (data.type === 'transaction') {
-                    // Update transaction UI
                     console.log('New transaction:', data.data);
                 } else if (data.type === 'block') {
-                    // Update block UI
                     console.log('New block:', data.data);
                 }
-
-                // Example: Refresh the page to reflect updates
-                // window.location.reload();
             };
 
             ws.onopen = function () {
@@ -52,7 +46,7 @@
             </ul>
         </nav>
     </header>
-    <main>
+    <main class="container">
         <h1>Latest Blocks</h1>
         <table>
             <thead>
@@ -77,5 +71,8 @@
             </tbody>
         </table>
     </main>
+    <footer class="footer">
+        <p>&copy; 2024 MALAC Blockchain Project</p>
+    </footer>
 </body>
 </html>
