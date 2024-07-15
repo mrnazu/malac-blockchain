@@ -6,6 +6,7 @@ const path = require('path');
 const axios = require('axios');
 const WebSocket = require('ws');
 const blockchainRoutes = require('../api/api');
+const Blockchain = require('../src/blockchain/blockchain');
 const app = express();
 const port = 3000;
 
@@ -25,7 +26,7 @@ const fetchDataWithRetry = async (url, retries = 5) => {
       }
     }
   }
-}
+};
 
 app.use(bodyParser.json());
 app.use('/api', blockchainRoutes);
@@ -74,7 +75,7 @@ app.get('/', async (req, res) => {
 // Route to get a specific block
 app.get('/block/:index', async (req, res) => {
     try {
-        const { data: block } = await fetchDataWithRetry(`http://localhost:${port}/api/block/${req.params.index}`);
+        const block = await fetchDataWithRetry(`http://localhost:${port}/api/block/${req.params.index}`);
         res.render('block', { block });
     } catch (error) {
         console.error('Error fetching block:', error);
