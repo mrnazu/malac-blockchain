@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/api-docs">API Docs</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="https://github.com/mrnazu/malac-blockchain" target="_blank">GitHub</a></li>
+                <li>Developer: Samuel (NAZU)</li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>API Documentation</h1>
+        <div id="api-docs-content">
+            <!-- The API docs will be loaded here -->
+        </div>
+    </main>
+    <script>
+        fetch('/docs/index.md')
+            .then(response => response.text())
+            .then(text => {
+                document.getElementById('api-docs-content').innerText = text;
+            })
+            .catch(error => console.error('Error loading API docs:', error));
+    </script>
+</body>
+</html>
