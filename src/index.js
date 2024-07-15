@@ -11,6 +11,14 @@ const fs = require('fs');
 const app = express();
 const port = 3000;
 
+// Custom renderer to add IDs to headings
+const renderer = new marked.Renderer();
+renderer.heading = (text, level) => {
+  const headingText = typeof text === 'string' ? text : '';
+  const escapedText = headingText.toLowerCase().replace(/[^\w]+/g, '-');
+  return `<h${level} id="${escapedText}">${headingText}</h${level}>`;
+};
+
 // Function to fetch data with retry logic
 const fetchDataWithRetry = async (url, retries = 5) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
@@ -62,7 +70,7 @@ app.server.on('upgrade', (request, socket, head) => {
   });
 });
 
-// Route to get latest blocks
+// get latest blocks
 app.get('/', async (req, res) => {
   try {
     const latestBlocks = await fetchDataWithRetry(`http://localhost:${port}/api/blockchain`);
@@ -73,12 +81,12 @@ app.get('/', async (req, res) => {
   }
 });
 
-// Route to render the About page
+// About page
 app.get('/about', (req, res) => {
   res.render('about');
 });
 
-// Route to render the API Docs page
+// API Docs
 app.get('/api-docs', (req, res) => {
   const markdownPath = path.join(__dirname, '../doc/Index.md');
   fs.readFile(markdownPath, 'utf-8', (err, data) => {
@@ -86,15 +94,13 @@ app.get('/api-docs', (req, res) => {
       console.error('Error reading API docs:', err);
       return res.status(500).send('Error loading API documentation');
     }
-    const htmlContent = marked(data);
+    const htmlContent = marked(data, { renderer });
     res.render('api-docs', { content: htmlContent });
   });
 });
 
-// Serve static files from the docs directory
 app.use('/docs', express.static(path.join(__dirname, '../doc')));
 
-// Route to get a specific block
 app.get('/block/:index', async (req, res) => {
   try {
     const block = await fetchDataWithRetry(`http://localhost:${port}/api/block/${req.params.index}`);
