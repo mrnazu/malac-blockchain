@@ -3,9 +3,9 @@
 const express = require('express');
 const router = express.Router();
 const Blockchain = require('../src/blockchain/blockchain');
-const Transaction = require('../src/blockchain/transaction');
+const { Transaction, saveTransaction } = require('../src/blockchain/transaction');
 const { validateTransaction } = require('./middleware/validationMiddleware');
-const { loadKeys } = require('../src/blockchain/keyManager');
+const { loadKeys } = require('../src/blockchain/crypto/keyManager');
 
 const blockchain = new Blockchain();
 
@@ -25,6 +25,13 @@ router.get('/block/:index', (req, res) => {
 
 router.post('/transaction', validateTransaction, (req, res) => {
   const { amount, sender, recipient } = req.body;
+  console.log('Received transaction request:', req.body);
+
+  // Validate the input
+  if (typeof amount !== 'number' || typeof sender !== 'string' || typeof recipient !== 'string' || typeof privateKey !== 'string') {
+    return res.status(400).json({ error: 'Invalid input data' })
+  }
+
   if (amount <= 0 || !sender || !recipient) {
     return res.status(400).json({ error: 'Invalid transaction data' });
   }
@@ -34,12 +41,23 @@ router.post('/transaction', validateTransaction, (req, res) => {
     if (!privateKey) {
       throw new Error('Failed to load private key');
     }
-    const transaction = new Transaction(amount, sender, recipient, privateKey); // Pass privateKey here
+    
+    const transaction = new Transaction(amount, sender, recipient, privateKey);
+    console.log('Created transaction:', transaction);
+
+    transaction.signTransaction();
+    console.log('Signed transaction:', transaction);
+
+    saveTransaction(transaction);
+    console.log('Transaction saved');
+
     const blockIndex = blockchain.createNewTransaction(transaction.amount, transaction.sender, transaction.recipient, transaction.signature, transaction.id);
+    console.log('Transaction added to blockchain, block index:', blockIndex);
+
     res.status(201).json({ message: `Transaction will be added in block ${blockIndex}`, transaction });
   } catch (error) {
     console.error('Error processing transaction:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 

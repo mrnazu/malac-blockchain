@@ -5,7 +5,8 @@ function validateTransaction(req, res, next) {
   if (
     typeof amount !== "number" ||
     typeof sender !== "string" ||
-    typeof recipient !== "string"
+    typeof recipient !== "string" ||
+    typeof privateKey !== "string"
   ) {
     return res.status(400).json({ error: "Invalid transaction data" });
   }

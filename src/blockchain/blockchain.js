@@ -3,7 +3,7 @@
 const Block = require("./block");
 const Transaction = require("./transaction");
 const { proofOfWork, hashBlock } = require("../consensus/pow");
-const { loadKeys } = require('./keyManager');
+const { loadKeys } = require('./crypto/keyManager');
 
 class Blockchain {
   constructor() {

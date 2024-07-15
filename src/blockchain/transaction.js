@@ -1,38 +1,52 @@
 // src/blockchain/transaction.js
 
-const crypto = require('crypto');
+// const { signData, verifySignature } = require('./crypto/signatureManager');
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
 
+// const TRANSACTIONS_DIR = path.join(__dirname, '../../data/transactions');
+
+// // Ensure the transactions directory exists
+// if (!fs.existsSync(TRANSACTIONS_DIR)) {
+//   fs.mkdirSync(TRANSACTIONS_DIR, { recursive: true });
+// }
+
+// Example of a transaction object
 class Transaction {
-  constructor(amount, sender, recipient, privateKey) {
-    this.id = crypto.randomUUID(); // Unique transaction ID
+  constructor(amount, sender, recipient, signature) {
     this.amount = amount;
     this.sender = sender;
     this.recipient = recipient;
-    this.timestamp = new Date().toISOString(); // Timestamp of transaction creation
-    this.signature = this.signTransaction(privateKey); // Digital signature
+    this.signature = signature;
+    this.id = null;
   }
 
   signTransaction(privateKey) {
-    try {
-      const sign = crypto.createSign('SHA256');
-      sign.update(`${this.amount}${this.sender}${this.recipient}${this.timestamp}`);
-      return sign.sign({ key: privateKey, padding: crypto.constants.RSA_PKCS1_PADDING }).toString('hex');
-    } catch (error) {
-      console.error('Error signing transaction:', error);
-      throw error;
+    if (typeof privateKey !== 'string') {
+        throw new TypeError('Private key must be a string');
     }
-  }
 
-  verifyTransactionSignature(publicKey) {
+    // Sign the transaction using the private key
     try {
-      const verify = crypto.createVerify('SHA256');
-      verify.update(`${this.amount}${this.sender}${this.recipient}${this.timestamp}`);
-      return verify.verify(publicKey, this.signature, 'hex');
+        const sign = crypto.createSign('SHA256');
+        sign.update(`${this.amount}${this.sender}${this.recipient}`);
+        sign.end();
+        const signature = sign.sign(privateKey, 'hex');
+        this.signature = signature;
     } catch (error) {
-      console.error('Error verifying transaction signature:', error);
-      throw error;
+        throw new Error('Failed to sign transaction: ' + error.message);
     }
-  }
+}
 }
 
-module.exports = Transaction;
+const saveTransaction = (transaction) => {
+  const filePath = path.join(
+    __dirname,
+    "../../data/transactions",
+    `${transaction.sender}_${Date.now()}.json`
+  );
+  fs.writeFileSync(filePath, JSON.stringify(transaction, null, 2));
+};
+
+module.exports = { Transaction, saveTransaction };
